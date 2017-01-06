@@ -96,17 +96,10 @@ log_dir = node['etherpad-lite']['logs_dir']
 access_log = log_dir + '/access.log'
 error_log = log_dir + '/error.log'
 
-# Upstart service config file
-template "/etc/init/" + node['etherpad-lite']['service_name'] + ".conf" do
-    source "upstart.conf.erb"
-    owner user
-    group group
-    variables({
-      :etherpad_installation_dir => project_path,
-      :etherpad_service_user => user,
-      :etherpad_access_log => access_log,
-      :etherpad_error_log => error_log,
-    })
+template '/lib/systemd/system/etherpad.service' do
+  source 'etherpad.service.erb'
+  owner user
+  group group
 end
 
 # Nginx config file
@@ -189,6 +182,5 @@ end
 
 # Register capture app as a service
 service node['etherpad-lite']['service_name'] do
-  provider Chef::Provider::Service::Upstart
   action :start
 end
